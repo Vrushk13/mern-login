@@ -2,31 +2,18 @@ version: 0.2
 
 env:
   variables:
-    AWS_REGION: ap-south-1
-    ACCOUNT_ID: 621703783626
-    BACKEND_IMAGE: mern-backend
-    FRONTEND_IMAGE: mern-frontend
+    ImageName: simple-docker-service-02506fc50bad
 
 phases:
   pre_build:
     commands:
-      - echo Logging in to Amazon ECR
-      - aws ecr get-login-password --region $AWS_REGION |
-        docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 621703783626.dkr.ecr.ap-south-1.amazonaws.com
 
   build:
     commands:
-      - echo Building backend image
-      - docker build -t $BACKEND_IMAGE backend
-      - echo Building frontend image
-      - docker build -t $FRONTEND_IMAGE frontend
+      - docker build -t $ImageName -f backend/Dockerfile backend
 
   post_build:
     commands:
-      - echo Tagging images
-      - docker tag $BACKEND_IMAGE:latest $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BACKEND_IMAGE:latest
-      - docker tag $FRONTEND_IMAGE:latest $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_IMAGE:latest
-
-      - echo Pushing images to ECR
-      - docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BACKEND_IMAGE:latest
-      - docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_IMAGE:latest
+      - docker tag $ImageName:latest 621703783626.dkr.ecr.ap-south-1.amazonaws.com/$ImageName:latest
+      - docker push 621703783626.dkr.ecr.ap-south-1.amazonaws.com/$ImageName:latest
