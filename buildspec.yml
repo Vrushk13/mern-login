@@ -1,19 +1,15 @@
 version: 0.2
 
 phases:
-  install:
-    runtime-versions:
-      nodejs: 18
+  pre_build:
     commands:
-      - echo Installing dependencies
-      - npm install --prefix backend
-      - npm install --prefix frontend
+      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 621703783626.dkr.ecr.ap-south-1.amazonaws.com
 
   build:
     commands:
-      - echo Build started
-      - npm run build --prefix frontend
+      - docker build -t $ImageName -f backend/Dockerfile backend
 
-artifacts:
-  files:
-    - '**/*'
+  post_build:
+    commands:
+      - docker tag $ImageName:latest 621703783626.dkr.ecr.ap-south-1.amazonaws.com/$ImageName:latest
+      - docker push 621703783626.dkr.ecr.ap-south-1.amazonaws.com/$ImageName:latest
